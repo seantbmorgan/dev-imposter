@@ -1,17 +1,42 @@
+import { gql } from '@apollo/client';
 import { config } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // The following import prevents a Font Awesome icon server-side rendering bug,
 // where the icons flash from a very large icon down to a properly sized one:
 import '@fortawesome/fontawesome-svg-core/styles.css';
 // Prevent fontawesome from adding its CSS since we did it manually above:
 import type { NextPage } from 'next';
+import { GetStaticProps } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import styles from '@styles/Home.module.css';
+import graphqlClient from '../graphClient';
 
 config.autoAddCss = false; /* eslint-disable import/first */
 
-const Home: NextPage = () => {
+type postPreviewContent = {
+  html: string;
+};
+
+type postPreview = {
+  id: string;
+  content: postPreviewContent;
+};
+
+type IProps = {
+  posts: postPreview[];
+};
+
+const POSTS = gql`
+  query getPosts {
+    posts {
+      id
+      content {
+        html
+      }
+    }
+  }
+`;
+
+const Home: NextPage<IProps> = ({ posts }) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -20,61 +45,32 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-        <h2 className="text-3xl p-4 text-red-500 font-bold">
-          With Tailwind
-          <span>
-            <FontAwesomeIcon icon={['fab', 'twitter']} />
-            <FontAwesomeIcon icon="coffee" />
-          </span>
-        </h2>
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href="https://github.com/vercel/next.js/tree/master/examples" className={styles.card}>
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
+      <main>
+        <h1>Welcome</h1>
+        {posts &&
+          posts.map((post: postPreview) => (
+            <div key={post.id}>
+              <div className="text-container" dangerouslySetInnerHTML={{ __html: post.content.html }} />
+              <hr />
+            </div>
+          ))}
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <footer>footer</footer>
     </div>
   );
+};
+
+export const getStaticProps: GetStaticProps = async () => {
+  // const { dropId, collectionId } = context.params;
+  // Check if dropId exists, if not 404
+
+  // const client = graphqlClient; //
+  const { data } = await graphqlClient.query({ query: POSTS });
+
+  return {
+    props: data,
+  };
 };
 
 export default Home;
