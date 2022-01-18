@@ -6,9 +6,9 @@ module.exports = {
     '<rootDir>/node_modules/',
     '<rootDir>/coverage',
     '<rootDir>/dist',
-    '<rootDir>/cypress',
+    'cypress',
   ],
-  moduleDirectories: ['<rootDir>/node_modules', '<rootDir>/src', '<rootDir>/pages'],
+  moduleDirectories: ['node_modules', 'src', 'pages'],
   moduleNameMapper: {
     '@src/(.*)': '<rootDir>/src/$1',
     '@pages/(.*)': '<rootDir>/pages/$1',

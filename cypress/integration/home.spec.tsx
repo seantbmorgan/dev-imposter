@@ -1,6 +1,6 @@
-/// <reference types="cypress"/>
+/// <reference types="cypress" />
 
-context('Home Page', () => {
+describe('Home Page', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3000');
   });
